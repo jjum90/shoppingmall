@@ -1,0 +1,274 @@
+@startuml
+class com.daou.shoppingmall.service.impl.ProductServiceImpl {
+- ProductRepository productRepository
++ List<ProductDto> getProducts()
+}
+class com.daou.shoppingmall.entity.Coupon {
+- Long id
+- BigDecimal referencePrice
+- double discountRate
+- Member member
+- UseStatus useStatus
+}
+class com.daou.shoppingmall.service.impl.MemberServiceImpl {
+- MemberRepository memberRepository
++ MemberDto getMemberBy(String)
+}
+class com.daou.shoppingmall.entity.OrderProduct {
+- Long id
+- Order order
+- Product product
+- BigDecimal orderPrice
+- int count
+}
+class com.daou.shoppingmall.service.impl.MileageOrderServiceImpl {
+- MemberRepository memberRepository
+- MileageRepository mileageRepository
+- OrderRepository orderRepository
++ void paymentOf(PurchaseDto)
++ boolean isSatisfied(PurchaseDto)
++ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+}
+class com.daou.shoppingmall.service.impl.CouponOrderServiceImpl {
+- MemberRepository memberRepository
+- CouponRepository couponRepository
+- OrderRepository orderRepository
++ void paymentOf(PurchaseDto)
++ boolean isSatisfied(PurchaseDto)
++ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+}
+interface com.daou.shoppingmall.repository.OrderRepository {
+~ List<Order> findById(String)
+}
+interface com.daou.shoppingmall.service.MemberService {
+~ MemberDto getMemberBy(String)
+}
+class com.daou.shoppingmall.entity.Point {
+- Long id
+- Member member
+- LocalDateTime expiryDate
+- BigDecimal balance
+}
+class com.daou.shoppingmall.service.impl.OrderWrapperServiceImpl {
+- Map<String,OrderService> serviceMap
++ OrderService getServiceOf(PurchaseDto)
+}
+interface com.daou.shoppingmall.repository.MileageRepository {
+~ Optional<Mileage> findById(Long)
+}
+interface com.daou.shoppingmall.service.ProductService {
+~ List<ProductDto> getProducts()
+}
+class com.daou.shoppingmall.service.impl.PointOrderServiceImpl {
+- MemberRepository memberRepository
+- OrderRepository orderRepository
+- PointHistoryRepository pointHistoryRepository
++ void paymentOf(PurchaseDto)
++ boolean isSatisfied(PurchaseDto)
++ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+}
+enum com.daou.shoppingmall.entity.UseStatus {
++  USED
++  UNUSED
+}
+class com.daou.shoppingmall.utils.ProcessUtil {
++ {static} DiscountContext getDefaultDiscountContext(Member,PurchaseDto)
+}
+class com.daou.shoppingmall.service.impl.PGOrderServiceImpl {
+- MemberRepository memberRepository
+- OrderRepository orderRepository
++ void paymentOf(PurchaseDto)
++ boolean isSatisfied(PurchaseDto)
++ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+}
+class com.daou.shoppingmall.controller.ProductController {
+- ProductService productService
++ List<ProductDto> getProducts()
+}
+interface com.daou.shoppingmall.service.DiscountPolicy {
+~ DiscountContext discountProcessor(DiscountContext,Member,PurchaseDto,DiscountPolicy)
+~ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+~ boolean isSatisfied(PurchaseDto)
+}
+interface com.daou.shoppingmall.repository.PointRepository {
+~ Optional<Point> findById(Long)
+~ List<Point> findByMemberId(Long)
+}
+class com.daou.shoppingmall.entity.Member {
+- Long id
+- String name
+- List<Coupon> coupons
+- List<Order> order
+- List<Point> points
+- Mileage mileage
+}
+class com.daou.shoppingmall.dto.PurchaseDto {
+- String memberId
+- String payType
+- List<String> pointIds
+- List<String> couponIds
+- BigDecimal totalAmount
+~ List<OrderDto> orders
+}
+interface com.daou.shoppingmall.repository.CouponRepository {
+~ Optional<Coupon> findById(Long)
+~ List<Coupon> findByMemberId(Long)
+}
+interface com.daou.shoppingmall.repository.PointHistoryRepository {
+~ PointHistory findById(String)
+}
+class com.daou.shoppingmall.entity.PointHistory {
+- Long id
+- Point point
+- Order order
+- BigDecimal usePoint
+}
+class com.daou.shoppingmall.entity.Product {
+- Long id
+- String name
+- BigDecimal price
+}
+class com.daou.shoppingmall.dto.DiscountContext {
+- Long memberId
+- Coupon coupon
+- List<PointHistory> pointHistories
+- BigDecimal mileage
+- BigDecimal totalPayAmount
+- BigDecimal totalAmount
+- BigDecimal totalDiscountAmount
+}
+interface com.daou.shoppingmall.repository.MemberRepository {
+~ Optional<Member> findById(Long)
+}
+class com.daou.shoppingmall.entity.Order {
+- Long id
+- List<PointHistory> pointHistories
+- Member member
+- Coupon coupon
+- BigDecimal mileage
+- BigDecimal payment
+}
+class com.daou.shoppingmall.entity.Mileage {
+- Long id
+- BigDecimal balance
+- Member member
+}
+enum com.daou.shoppingmall.utils.PayType {
++  AUTO
++  COUPON
++  POINT
++  MILEAGE
++  PG
+- Class<? extends OrderService> serviceType
+- int priority
++ Class<? extends OrderService> getServiceType()
++ int getPriority()
++ {static} PayType fromType(String)
++ {static} PayType fromClassType(Class<T>)
+}
+abstract class com.daou.shoppingmall.entity.BaseEntity {
+- LocalDateTime createdDate
+}
+class com.daou.shoppingmall.ShoppingMallApplication {
++ {static} void main(String[])
+}
+interface com.daou.shoppingmall.repository.ProductRepository {
+}
+class com.daou.shoppingmall.dto.OrderDto {
+- String productId
+- BigDecimal amount
+- Integer quantity
+}
+class com.daou.shoppingmall.controller.OrderController {
+- OrderWrapperServiceImpl orderWrapperService
++ void purchase(PurchaseDto)
+}
+class com.daou.shoppingmall.utils.Money {
++ {static} Money ZERO
+- BigDecimal amount
++ BigDecimal getAmount()
++ {static} Money wons(BigDecimal)
++ {static} Money wons(long)
++ Money plus(Money)
++ Money minus(Money)
++ Money times(double)
++ Money times(int)
++ boolean isLessThan(Money)
++ boolean isGreaterThanOrEqual(Money)
++ boolean isEqual(Money)
+}
+class com.daou.shoppingmall.controller.MemberController {
+- MemberService memberService
++ MemberDto getMemberBy(String)
+}
+class com.daou.shoppingmall.config.WebConfig {
++ void addCorsMappings(CorsRegistry)
+}
+interface com.daou.shoppingmall.service.OrderService {
+~ void paymentOf(PurchaseDto)
+}
+class com.daou.shoppingmall.service.impl.AutoOrderServiceImpl {
+- MemberRepository memberRepository
+- PointHistoryRepository pointHistoryRepository
+- MileageRepository mileageRepository
+- CouponRepository couponRepository
+- OrderRepository orderRepository
+- List<DiscountPolicy> policies
++ void paymentOf(PurchaseDto)
++ boolean isSatisfied(PurchaseDto)
++ DiscountContext processDiscount(DiscountContext,Member,PurchaseDto)
+- DiscountPolicy[] getPriorityDiscountPolicy()
+}
+class com.daou.shoppingmall.service.impl.AutoOrderServiceImpl.PriorityDiscount {
+- int priority
+- DiscountPolicy policy
++ int compareTo(PriorityDiscount)
+}
+class com.daou.shoppingmall.dto.ProductDto {
+- Long id
+- String name
+- BigDecimal price
+- int selectQuantity
+}
+class com.daou.shoppingmall.dto.MemberDto {
+- Long id
+- String name
+- List<Coupon> coupons
+- List<Order> order
+- List<Point> points
+- Mileage mileage
+}
+
+
+com.daou.shoppingmall.service.ProductService <|.. com.daou.shoppingmall.service.impl.ProductServiceImpl
+java.io.Serializable <|.. com.daou.shoppingmall.entity.Coupon
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.Coupon
+com.daou.shoppingmall.service.MemberService <|.. com.daou.shoppingmall.service.impl.MemberServiceImpl
+java.io.Serializable <|.. com.daou.shoppingmall.entity.OrderProduct
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.OrderProduct
+com.daou.shoppingmall.service.OrderService <|.. com.daou.shoppingmall.service.impl.MileageOrderServiceImpl
+com.daou.shoppingmall.service.OrderService <|.. com.daou.shoppingmall.service.impl.CouponOrderServiceImpl
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.OrderRepository
+java.io.Serializable <|.. com.daou.shoppingmall.entity.Point
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.Point
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.MileageRepository
+com.daou.shoppingmall.service.OrderService <|.. com.daou.shoppingmall.service.impl.PointOrderServiceImpl
+com.daou.shoppingmall.service.OrderService <|.. com.daou.shoppingmall.service.impl.PGOrderServiceImpl
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.PointRepository
+java.io.Serializable <|.. com.daou.shoppingmall.entity.Member
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.Member
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.CouponRepository
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.PointHistoryRepository
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.PointHistory
+java.io.Serializable <|.. com.daou.shoppingmall.entity.Product
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.Product
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.MemberRepository
+java.io.Serializable <|.. com.daou.shoppingmall.entity.Order
+com.daou.shoppingmall.entity.BaseEntity <|-- com.daou.shoppingmall.entity.Order
+org.springframework.data.jpa.repository.JpaRepository <|-- com.daou.shoppingmall.repository.ProductRepository
+org.springframework.web.servlet.config.annotation.WebMvcConfigurer <|.. com.daou.shoppingmall.config.WebConfig
+com.daou.shoppingmall.service.DiscountPolicy <|-- com.daou.shoppingmall.service.OrderService
+com.daou.shoppingmall.service.OrderService <|.. com.daou.shoppingmall.service.impl.AutoOrderServiceImpl
+com.daou.shoppingmall.service.impl.AutoOrderServiceImpl +.. com.daou.shoppingmall.service.impl.AutoOrderServiceImpl.PriorityDiscount
+com.daou.shoppingmall.service.impl.Comparable <|.. com.daou.shoppingmall.service.impl.AutoOrderServiceImpl.PriorityDiscount
+@enduml

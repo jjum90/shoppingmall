@@ -1,0 +1,24 @@
+server:
+  port : 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+
+spring:
+  application:
+    name: shoppingmall
+  datasource:
+    username: 'user'
+    password: '1234'
+    url: jdbc:h2:tcp://localhost/~/shoppingmall
+    driver-class-name: org.h2.Driver
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql : true
+    properties:
+      hibernate:
+        format_sql: true

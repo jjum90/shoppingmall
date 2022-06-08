@@ -1,0 +1,57 @@
+package com.daou.shoppingmall.service.impl;
+
+import com.daou.shoppingmall.dto.DiscountContext;
+import com.daou.shoppingmall.dto.PurchaseDto;
+import com.daou.shoppingmall.entity.Member;
+import com.daou.shoppingmall.entity.Order;
+import com.daou.shoppingmall.repository.MemberRepository;
+import com.daou.shoppingmall.repository.OrderRepository;
+import com.daou.shoppingmall.service.OrderService;
+import com.daou.shoppingmall.utils.PayType;
+import com.daou.shoppingmall.utils.ProcessUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+/**
+ * PG사 직접 결제 구현 서비스
+ */
+@Service
+@RequiredArgsConstructor
+public class PGOrderServiceImpl implements OrderService {
+    private final MemberRepository memberRepository;
+    private final OrderRepository orderRepository;
+
+    @Override
+    @Transactional
+    public void paymentOf(PurchaseDto purchaseDto) {
+        Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
+        if(!optMember.isPresent()) {
+            throw new IllegalStateException("Not fount Member By id " + purchaseDto.getMemberId());
+        }
+        Member member = optMember.get();
+        DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
+        context = discountProcessor(context, member, purchaseDto, this);
+
+        Order order = Order.builder()
+                .createdDate(LocalDateTime.now())
+                .member(member)
+                .payment(purchaseDto.getTotalAmount())
+                .build();
+        orderRepository.save(order);
+    }
+
+    @Override
+    public boolean isSatisfied(PurchaseDto purchaseDto) {
+        return PayType.PG.name().equals(purchaseDto.getPayType());
+    }
+
+    @Override
+    public DiscountContext processDiscount(DiscountContext context, Member member, PurchaseDto purchaseDto) {
+        return context;
+    }
+
+}
