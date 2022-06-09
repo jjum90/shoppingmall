@@ -21,8 +21,8 @@ public class PurchaseDto {
     private String memberId;
     @NotBlank(message = "결제 타입을 확인해주세요.")
     private String payType;
-    private List<String> pointIds;
-    private List<String> couponIds;
+//    private List<String> pointIds;
+//    private List<String> couponIds;
 //    private BigDecimal mileage;
     @NotNull
     private BigDecimal totalAmount;
