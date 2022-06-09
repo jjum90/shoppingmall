@@ -108,7 +108,7 @@ public class AutoOrderServiceImpl implements OrderService {
     private DiscountPolicy[] getPriorityDiscountPolicy () {
         PriorityQueue<PriorityDiscount> priorityQueue = new PriorityQueue<>();
         for (DiscountPolicy policy : policies) {
-            PayType payType = PayType.fromClassType(policy.getClass());
+            PayType payType = PayType.fromOf(policy);
             priorityQueue.add(new PriorityDiscount(payType.getPriority(), policy));
         }
         List<DiscountPolicy> list = priorityQueue.stream().map(priorityDiscount -> priorityDiscount.getPolicy()).collect(Collectors.toList());

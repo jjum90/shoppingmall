@@ -40,12 +40,16 @@ public enum PayType {
         return null;
     }
 
-    public static <T> PayType fromClassType(Class<T> classType) {
-        for (PayType payType : values()) {
-            if (payType.getServiceType() == classType) {
-                return payType;
-            }
+    public static <T> PayType fromOf(DiscountPolicy policy) {
+        if (policy instanceof CouponOrderServiceImpl) {
+            return PayType.COUPON;
+        }else if (policy instanceof PointOrderServiceImpl) {
+            return PayType.POINT;
+        }else if (policy instanceof MileageOrderServiceImpl) {
+            return PayType.MILEAGE;
+        }else if (policy instanceof PGOrderServiceImpl) {
+            return PayType.PG;
         }
-        return null;
+        return PayType.AUTO;
     }
 }

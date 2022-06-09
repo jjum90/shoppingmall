@@ -8,9 +8,6 @@
     drop table if exists mileage CASCADE;
 
 
-    drop table if exists mileage_history CASCADE;
-
-
     drop table if exists order_product CASCADE;
 
 
@@ -54,7 +51,6 @@
 
  create sequence hibernate_sequence start with 1 increment by 1;
  create sequence member_id_sequence start with 2 increment by 50;
- create sequence mileage_his_id_sequence start with 1 increment by 50;
  create sequence mileage_id_sequence start with 2 increment by 50;
  create sequence order_id_sequence start with 1 increment by 50;
  create sequence order_product_id_sequence start with 1 increment by 50;
@@ -89,14 +85,6 @@
     );
 
 
-    create table mileage_history (
-       mileage_his_id bigint not null,
-        use_mileage numeric(19,2),
-        mileage_id bigint,
-        primary key (mileage_his_id)
-    );
-
-
     create table order_product (
        order_product_id bigint not null,
         created_date timestamp,
@@ -114,7 +102,7 @@
         payment numeric(19,2),
         coupon_id bigint,
         member_id bigint,
-        mileage_his_id bigint,
+        mileage numeric(19,2),
         primary key (order_id)
     );
 
@@ -159,13 +147,6 @@
        foreign key (member_id)
        references member;
 
-
-    alter table mileage_history
-       add constraint FK_MILEAGE_HIS_MILEAGE
-       foreign key (mileage_id)
-       references mileage;
-
-
     alter table order_product
        add constraint FK_ORDER_PRODUCT_ORDER
        foreign key (order_id)
@@ -188,13 +169,6 @@
        add constraint FK_ORDERS_MEMBER
        foreign key (member_id)
        references member;
-
-
-    alter table orders
-       add constraint FK_ORDERS_MILEAGE_HIS
-       foreign key (mileage_his_id)
-       references mileage_history;
-
 
     alter table point
        add constraint FK_POINT_MEMBER
