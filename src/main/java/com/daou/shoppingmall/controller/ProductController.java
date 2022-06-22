@@ -19,6 +19,10 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
+    /**
+     * 상품 조회 API
+     * @return
+     */
     @GetMapping
     public List<ProductDto> getProducts() {
         log.info("get all products");

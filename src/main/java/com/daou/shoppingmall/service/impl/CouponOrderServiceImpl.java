@@ -2,10 +2,7 @@ package com.daou.shoppingmall.service.impl;
 
 import com.daou.shoppingmall.dto.DiscountContext;
 import com.daou.shoppingmall.dto.PurchaseDto;
-import com.daou.shoppingmall.entity.Coupon;
-import com.daou.shoppingmall.entity.Member;
-import com.daou.shoppingmall.entity.Order;
-import com.daou.shoppingmall.entity.UseStatus;
+import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.CouponRepository;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
@@ -59,8 +56,15 @@ public class CouponOrderServiceImpl implements OrderService {
                 .coupon(coupon)
                 .member(member)
                 .payment(purchaseDto.getTotalAmount())
+                .orderStatus(OrderStatus.COMPLETE)
+                .payType(PayType.COUPON)
                 .build();
         orderRepository.save(order);
+    }
+
+    @Override
+    public void refundOf(String orderId) {
+
     }
 
     @Override

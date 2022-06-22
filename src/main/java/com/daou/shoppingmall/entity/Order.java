@@ -1,11 +1,13 @@
 package com.daou.shoppingmall.entity;
 
+import com.daou.shoppingmall.utils.PayType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,4 +44,13 @@ public class Order extends BaseEntity implements Serializable {
 
     @Column(name = "PAYMENT")
     private BigDecimal payment;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderProduct> orderProduct = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PayType payType;
 }

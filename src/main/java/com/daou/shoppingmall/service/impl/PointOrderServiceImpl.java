@@ -2,10 +2,7 @@ package com.daou.shoppingmall.service.impl;
 
 import com.daou.shoppingmall.dto.DiscountContext;
 import com.daou.shoppingmall.dto.PurchaseDto;
-import com.daou.shoppingmall.entity.Member;
-import com.daou.shoppingmall.entity.Order;
-import com.daou.shoppingmall.entity.Point;
-import com.daou.shoppingmall.entity.PointHistory;
+import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
 import com.daou.shoppingmall.repository.PointHistoryRepository;
@@ -46,6 +43,8 @@ public class PointOrderServiceImpl implements OrderService {
                 .createdDate(LocalDateTime.now())
                 .member(member)
                 .payment(purchaseDto.getTotalAmount())
+                .orderStatus(OrderStatus.COMPLETE)
+                .payType(PayType.PG)
                 .build();
         orderRepository.save(order);
 
@@ -55,6 +54,11 @@ public class PointOrderServiceImpl implements OrderService {
                 pointHistoryRepository.save(pointHis);
             }
         }
+    }
+
+    @Override
+    public void refundOf(String orderId) {
+
     }
 
     @Override

@@ -77,6 +77,8 @@ public class AutoOrderServiceImpl implements OrderService {
                 .member(member)
                 .payment(context.getTotalPayAmount())
                 .mileage(context.getMileage())
+                .orderStatus(OrderStatus.COMPLETE)
+                .payType(PayType.AUTO)
                 .build();
         orderRepository.save(order);
 
@@ -93,6 +95,11 @@ public class AutoOrderServiceImpl implements OrderService {
                 );
             }
         }
+    }
+
+    @Override
+    public void refundOf(String orderId) {
+
     }
 
     @Override

@@ -99,10 +99,12 @@
     create table orders (
        order_id bigint not null,
         created_date timestamp,
+        mileage numeric(19,2),
+        order_status varchar(255),
+        pay_type varchar(255),
         payment numeric(19,2),
         coupon_id bigint,
         member_id bigint,
-        mileage numeric(19,2),
         primary key (order_id)
     );
 

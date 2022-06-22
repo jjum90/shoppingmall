@@ -7,4 +7,5 @@ import com.daou.shoppingmall.dto.PurchaseDto;
  */
 public interface OrderService extends DiscountPolicy{
     void paymentOf(PurchaseDto purchaseDto);
+    void refundOf(String orderId);
 }

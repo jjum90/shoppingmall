@@ -5,6 +5,7 @@ import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.Member;
 import com.daou.shoppingmall.entity.Mileage;
 import com.daou.shoppingmall.entity.Order;
+import com.daou.shoppingmall.entity.OrderStatus;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.MileageRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
@@ -43,6 +44,8 @@ public class MileageOrderServiceImpl implements OrderService {
                 .createdDate(LocalDateTime.now())
                 .member(member)
                 .payment(purchaseDto.getTotalAmount())
+                .orderStatus(OrderStatus.COMPLETE)
+                .payType(PayType.COUPON)
                 .build();
         orderRepository.save(order);
 
@@ -55,6 +58,11 @@ public class MileageOrderServiceImpl implements OrderService {
                 mileageRepository.save(mileage);
             }
         }
+    }
+
+    @Override
+    public void refundOf(String orderId) {
+
     }
 
     @Override

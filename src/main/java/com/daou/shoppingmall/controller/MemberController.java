@@ -19,9 +19,15 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    /**
+     * 멤버 조회 API
+     * @param memberId
+     * @return
+     * @throws NotFoundException
+     */
     @GetMapping("/{memberId}")
     public MemberDto getMemberBy(@PathVariable String memberId) throws NotFoundException {
         log.info("get member info by {} ", memberId);
-       return  memberService.getMemberBy(memberId);
+       return memberService.getMemberBy(memberId);
     }
 }

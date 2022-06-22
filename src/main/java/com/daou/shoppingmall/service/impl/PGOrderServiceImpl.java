@@ -4,6 +4,7 @@ import com.daou.shoppingmall.dto.DiscountContext;
 import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.Member;
 import com.daou.shoppingmall.entity.Order;
+import com.daou.shoppingmall.entity.OrderStatus;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
 import com.daou.shoppingmall.service.OrderService;
@@ -40,8 +41,15 @@ public class PGOrderServiceImpl implements OrderService {
                 .createdDate(LocalDateTime.now())
                 .member(member)
                 .payment(purchaseDto.getTotalAmount())
+                .orderStatus(OrderStatus.COMPLETE)
+                .payType(PayType.PG)
                 .build();
         orderRepository.save(order);
+    }
+
+    @Override
+    public void refundOf(String orderId) {
+
     }
 
     @Override
