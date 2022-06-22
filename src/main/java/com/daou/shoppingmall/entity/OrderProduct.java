@@ -12,9 +12,9 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Entity
 public class OrderProduct extends BaseEntity implements Serializable {
     @Id

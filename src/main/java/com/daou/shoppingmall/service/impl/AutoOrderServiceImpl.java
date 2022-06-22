@@ -1,6 +1,8 @@
 package com.daou.shoppingmall.service.impl;
 
 import com.daou.shoppingmall.dto.DiscountContext;
+import com.daou.shoppingmall.dto.OrderDto;
+import com.daou.shoppingmall.dto.ProductDto;
 import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.*;
@@ -17,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +33,8 @@ public class AutoOrderServiceImpl implements OrderService {
     private final MileageRepository mileageRepository;
     private final CouponRepository couponRepository;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final OrderProductRepository orderProductRepository;
     private final List<DiscountPolicy> policies;
 
     /**
@@ -75,12 +80,34 @@ public class AutoOrderServiceImpl implements OrderService {
                 .createdDate(LocalDateTime.now())
                 .coupon(coupon)
                 .member(member)
+                .createdDate(LocalDateTime.now())
                 .payment(context.getTotalPayAmount())
                 .mileage(context.getMileage())
                 .orderStatus(OrderStatus.COMPLETE)
                 .payType(PayType.AUTO)
                 .build();
         orderRepository.save(order);
+
+        if(!ObjectUtils.isEmpty(purchaseDto.getOrder())){
+            List<Long> productIds = purchaseDto.getOrder().getProducts().stream().filter((ProductDto productDto) -> {
+                return productDto.getSelectQuantity() > 0;
+            }).map((ProductDto::getId)).collect(Collectors.toList());
+            Map<Long, Product> productsMap = productRepository.findAllById(productIds).stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+            List<OrderProduct> orderProducts = new ArrayList<>();
+
+            for (int index = 0; index < productIds.size(); index++) {
+                orderProducts.add(
+                        OrderProduct.builder()
+                                .product(productsMap.get(productIds.get(index)))
+                                .orderPrice(productsMap.get(productIds.get(index)).getPrice())
+                                .order(order)
+                                .createdDate(LocalDateTime.now())
+                                .count(1) //TODO COUNT 바꾸도록 수정 필요
+                                .build()
+                );
+            }
+            orderProductRepository.saveAll(orderProducts);
+        }
 
         if(!CollectionUtils.isEmpty(context.getPointHistories())) {
             List<PointHistory> pointHistories = context.getPointHistories();

@@ -25,5 +25,5 @@ public class PurchaseDto {
     private BigDecimal totalAmount;
     @NotNull(message = "주문 리스트를 확인해 주세요")
     @Valid
-    List<OrderDto> orders = new ArrayList<>();
+    OrderDto order;
 }
