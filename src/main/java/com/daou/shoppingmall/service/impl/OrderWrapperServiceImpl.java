@@ -84,6 +84,7 @@ public class OrderWrapperServiceImpl implements OrderWrapperService {
                         .id(product.getId())
                         .name(product.getName())
                         .price(product.getPrice())
+                        .selectQuantity(orderProduct.getCount())
                         .build();
             }).collect(Collectors.toList());
 
