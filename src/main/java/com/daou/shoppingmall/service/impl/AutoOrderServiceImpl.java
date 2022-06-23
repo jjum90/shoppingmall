@@ -57,6 +57,19 @@ public class AutoOrderServiceImpl implements OrderService {
         Member member = optMember.get();
         DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
         context = discountProcessor(context, member, purchaseDto, getPriorityDiscountPolicy());
+
+        Coupon coupon = saveCoupon(context);
+
+        saveMileage(member, context);
+
+        Order order = saveOrder(member, context, coupon);
+
+        saveOrderProduct(purchaseDto, order);
+
+        savePointHistory(context, order);
+    }
+
+    private Coupon saveCoupon(DiscountContext context) {
         Coupon coupon = null;
 
         if(!ObjectUtils.isEmpty(context.getCoupon())) {
@@ -66,7 +79,10 @@ public class AutoOrderServiceImpl implements OrderService {
                 coupon.setUseStatus(UseStatus.USED);
             }
         }
+        return coupon;
+    }
 
+    private void saveMileage(Member member, DiscountContext context) {
         if(!ObjectUtils.isEmpty(context.getMileage())) {
             Optional<Mileage> optMileage = mileageRepository.findById(member.getMileage().getId());
             if(optMileage.isPresent()) {
@@ -75,7 +91,9 @@ public class AutoOrderServiceImpl implements OrderService {
                 mileage.setBalance(mileageMoney.getAmount());
             }
         }
+    }
 
+    private Order saveOrder(Member member, DiscountContext context, Coupon coupon) {
         Order order = Order.builder()
                 .createdDate(LocalDateTime.now())
                 .coupon(coupon)
@@ -87,12 +105,23 @@ public class AutoOrderServiceImpl implements OrderService {
                 .payType(PayType.AUTO)
                 .build();
         orderRepository.save(order);
+        return order;
+    }
 
+    private void saveOrderProduct(PurchaseDto purchaseDto, Order order) {
         if(!ObjectUtils.isEmpty(purchaseDto.getOrder())){
-            List<Long> productIds = purchaseDto.getOrder().getProducts().stream().filter((ProductDto productDto) -> {
+            List<Long> productIds = purchaseDto.getOrder().getProducts().stream()
+            .filter((ProductDto productDto) -> {
                 return productDto.getSelectQuantity() > 0;
             }).map((ProductDto::getId)).collect(Collectors.toList());
-            Map<Long, Product> productsMap = productRepository.findAllById(productIds).stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+
+            Map<Long, ProductDto> productDtoMap = purchaseDto.getOrder().getProducts().stream()
+                    .filter((ProductDto productDto) -> {
+                        return productDto.getSelectQuantity() > 0;
+                    }).collect(Collectors.toMap(ProductDto::getId, Function.identity()));
+
+            Map<Long, Product> productsMap = productRepository.findAllById(productIds).stream()
+                    .collect(Collectors.toMap(Product::getId, Function.identity()));
             List<OrderProduct> orderProducts = new ArrayList<>();
 
             for (int index = 0; index < productIds.size(); index++) {
@@ -102,13 +131,15 @@ public class AutoOrderServiceImpl implements OrderService {
                                 .orderPrice(productsMap.get(productIds.get(index)).getPrice())
                                 .order(order)
                                 .createdDate(LocalDateTime.now())
-                                .count(1) //TODO COUNT 바꾸도록 수정 필요
+                                .count(productDtoMap.get(productIds.get(index)).getSelectQuantity())
                                 .build()
                 );
             }
             orderProductRepository.saveAll(orderProducts);
         }
+    }
 
+    private void savePointHistory(DiscountContext context, Order order) {
         if(!CollectionUtils.isEmpty(context.getPointHistories())) {
             List<PointHistory> pointHistories = context.getPointHistories();
             for (PointHistory pointHis: pointHistories) {
