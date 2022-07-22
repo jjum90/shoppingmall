@@ -35,7 +35,7 @@ public class MileageOrderServiceImpl implements OrderService {
     public void paymentOf(PurchaseDto purchaseDto) {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
         if(!optMember.isPresent()) {
-            throw new IllegalStateException("Not fount Member By id " + purchaseDto.getMemberId());
+            throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
         DiscountContext context = discountProcessor(new DiscountContext(), member, purchaseDto, this);

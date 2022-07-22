@@ -23,11 +23,16 @@ public class MemberServiceImpl implements MemberService {
     public MemberDto getMemberBy(String memberId) {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(memberId));
         if(!optMember.isPresent()) {
-            throw new IllegalStateException("Not fount Member By id " + memberId);
+            throw new IllegalStateException("Not found member by id " + memberId);
         }
         Member member = optMember.get();
         List<Coupon> coupons = new ArrayList<>(member.getCoupons());
+        coupons = coupons.stream().filter((Coupon coupon)->
+            coupon.getUseStatus().name().equals(UseStatus.UNUSED.name())
+        ).collect(Collectors.toList());
+
         List<Point> points = new ArrayList<>(member.getPoints());
+
         return MemberDto.builder().id(member.getId())
                 .name(member.getName())
                 .coupons(coupons)

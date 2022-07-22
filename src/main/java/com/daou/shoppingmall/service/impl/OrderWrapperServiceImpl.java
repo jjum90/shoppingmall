@@ -73,8 +73,7 @@ public class OrderWrapperServiceImpl implements OrderWrapperService {
      * @return
      */
     public List<OrderDto> getOrders() {
-        PageRequest pageRequest = PageRequest.of(0, 20);
-        Page<Order> pageOrder = orderRepository.findAll(pageRequest);
+        Page<Order> pageOrder = orderRepository.findAll(PageRequest.of(0, 20));
 
         List<OrderDto> orders = pageOrder.stream().map((Order order) -> {
             List<OrderProduct> orderProducts = order.getOrderProduct();

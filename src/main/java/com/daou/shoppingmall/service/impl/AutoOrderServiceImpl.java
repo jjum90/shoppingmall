@@ -1,7 +1,6 @@
 package com.daou.shoppingmall.service.impl;
 
 import com.daou.shoppingmall.dto.DiscountContext;
-import com.daou.shoppingmall.dto.OrderDto;
 import com.daou.shoppingmall.dto.ProductDto;
 import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.*;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -111,14 +111,12 @@ public class AutoOrderServiceImpl implements OrderService {
     private void saveOrderProduct(PurchaseDto purchaseDto, Order order) {
         if(!ObjectUtils.isEmpty(purchaseDto.getOrder())){
             List<Long> productIds = purchaseDto.getOrder().getProducts().stream()
-            .filter((ProductDto productDto) -> {
-                return productDto.getSelectQuantity() > 0;
-            }).map((ProductDto::getId)).collect(Collectors.toList());
+            .filter((ProductDto productDto) -> productDto.getSelectQuantity() > 0)
+            .map((ProductDto::getId)).collect(Collectors.toList());
 
             Map<Long, ProductDto> productDtoMap = purchaseDto.getOrder().getProducts().stream()
-                    .filter((ProductDto productDto) -> {
-                        return productDto.getSelectQuantity() > 0;
-                    }).collect(Collectors.toMap(ProductDto::getId, Function.identity()));
+                    .filter((ProductDto productDto) -> productDto.getSelectQuantity() > 0)
+                    .collect(Collectors.toMap(ProductDto::getId, Function.identity()));
 
             Map<Long, Product> productsMap = productRepository.findAllById(productIds).stream()
                     .collect(Collectors.toMap(Product::getId, Function.identity()));
@@ -126,13 +124,13 @@ public class AutoOrderServiceImpl implements OrderService {
 
             for (int index = 0; index < productIds.size(); index++) {
                 orderProducts.add(
-                        OrderProduct.builder()
-                                .product(productsMap.get(productIds.get(index)))
-                                .orderPrice(productsMap.get(productIds.get(index)).getPrice())
-                                .order(order)
-                                .createdDate(LocalDateTime.now())
-                                .count(productDtoMap.get(productIds.get(index)).getSelectQuantity())
-                                .build()
+                    OrderProduct.builder()
+                            .product(productsMap.get(productIds.get(index)))
+                            .orderPrice(productsMap.get(productIds.get(index)).getPrice())
+                            .order(order)
+                            .createdDate(LocalDateTime.now())
+                            .count(productDtoMap.get(productIds.get(index)).getSelectQuantity())
+                            .build()
                 );
             }
             orderProductRepository.saveAll(orderProducts);

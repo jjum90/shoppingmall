@@ -2,13 +2,14 @@ package com.daou.shoppingmall.controller;
 
 import com.daou.shoppingmall.dto.OrderDto;
 import com.daou.shoppingmall.dto.PurchaseDto;
+import com.daou.shoppingmall.exception.InvalidParameterException;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.service.OrderWrapperService;
-import com.daou.shoppingmall.service.impl.OrderWrapperServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -24,8 +25,11 @@ public class OrderController {
      * @param purchaseDto
      */
     @PostMapping
-    public void purchase(@RequestBody @Valid PurchaseDto purchaseDto)  {
+    public void purchase(@RequestBody @Valid PurchaseDto purchaseDto, BindingResult bindingResult)  {
         log.info("New purchase registration. purchase info : {}",  purchaseDto);
+        if(bindingResult.hasErrors()) {
+            throw new InvalidParameterException("Invalid parameters", bindingResult);
+        }
         OrderService orderService = orderWrapperService.getPurchaseServiceOf(purchaseDto);
         orderService.paymentOf(purchaseDto);
     }

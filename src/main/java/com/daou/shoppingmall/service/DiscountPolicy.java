@@ -21,6 +21,7 @@ public interface DiscountPolicy {
     default DiscountContext discountProcessor(DiscountContext context, Member member, PurchaseDto purchaseDto, DiscountPolicy... policies) {
         Money totalAmountMoney = Money.wons(purchaseDto.getTotalAmount());
         Money totalPayAmountMoney = Money.wons(purchaseDto.getTotalAmount());
+        
         if(totalAmountMoney.isLessThan(Money.ZERO) || totalPayAmountMoney.isEqual(Money.ZERO)) {
             return context;
         }

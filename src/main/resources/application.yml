@@ -13,7 +13,7 @@ spring:
     password: '1234'
     url: jdbc:h2:tcp://localhost/~/shoppingmall
     driver-class-name: org.h2.Driver
-    initialization-mode: always
+    initialization-mode: ALWAYS
   h2:
     console:
       enabled: true

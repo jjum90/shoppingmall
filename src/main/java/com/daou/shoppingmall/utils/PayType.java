@@ -4,7 +4,7 @@ import com.daou.shoppingmall.service.*;
 import com.daou.shoppingmall.service.impl.*;
 
 /**
- * 결제 타입과 우선순위를 관리하는 ENUM
+ * 결제 타입과 우선 순위를 관리하는 ENUM
  * 첫 번째 인자 - 결제 서비스
  * 두 번째 인자 - 우선 순위
  */
