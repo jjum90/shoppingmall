@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderDto {
     private Long id;
-    @NotNull(message = "주문 금액을 확인해 주세요")
     private BigDecimal amount;
     @Valid
     @NotNull(message = "주문 상품을 확인해 주세요")
