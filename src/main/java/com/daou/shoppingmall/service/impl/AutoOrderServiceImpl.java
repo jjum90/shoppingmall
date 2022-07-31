@@ -9,7 +9,6 @@ import com.daou.shoppingmall.service.DiscountPolicy;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.Money;
 import com.daou.shoppingmall.utils.PayType;
-import com.daou.shoppingmall.utils.ProcessUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,11 +51,11 @@ public class AutoOrderServiceImpl implements OrderService {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
 
         if(!optMember.isPresent()) {
-            throw new IllegalStateException("Not fount Member By id " + purchaseDto.getMemberId());
+            throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
-        context = discountProcessor(context, member, purchaseDto, getPriorityDiscountPolicy());
+
+        DiscountContext context = discountProcessor(member, purchaseDto, getPriorityDiscountPolicy());
 
         Coupon coupon = saveCoupon(context);
 

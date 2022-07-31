@@ -9,7 +9,6 @@ import com.daou.shoppingmall.repository.OrderRepository;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.Money;
 import com.daou.shoppingmall.utils.PayType;
-import com.daou.shoppingmall.utils.ProcessUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -38,8 +37,7 @@ public class CouponOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
-        context = discountProcessor(context, member, purchaseDto, this);
+        DiscountContext context = discountProcessor(member, purchaseDto, this);
 
         Coupon coupon = null;
 

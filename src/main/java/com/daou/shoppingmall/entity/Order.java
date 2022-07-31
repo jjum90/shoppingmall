@@ -3,6 +3,7 @@ package com.daou.shoppingmall.entity;
 import com.daou.shoppingmall.utils.PayType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -28,6 +29,7 @@ public class Order extends BaseEntity implements Serializable {
     @Column(name = "ORDER_ID")
     private Long id;
 
+    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "order")
     @Column(name = "POINT_HIS")
     private List<PointHistory> pointHistories;
@@ -45,6 +47,7 @@ public class Order extends BaseEntity implements Serializable {
     @Column(name = "PAYMENT")
     private BigDecimal payment;
 
+    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "order")
     private List<OrderProduct> orderProduct = new ArrayList<>();
 

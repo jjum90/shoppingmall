@@ -1,10 +1,11 @@
 package com.daou.shoppingmall.service.impl;
 
 import com.daou.shoppingmall.dto.MemberDto;
-import com.daou.shoppingmall.entity.*;
-import com.daou.shoppingmall.repository.CouponRepository;
+import com.daou.shoppingmall.entity.Coupon;
+import com.daou.shoppingmall.entity.Member;
+import com.daou.shoppingmall.entity.Point;
+import com.daou.shoppingmall.entity.UseStatus;
 import com.daou.shoppingmall.repository.MemberRepository;
-import com.daou.shoppingmall.repository.PointRepository;
 import com.daou.shoppingmall.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class MemberServiceImpl implements MemberService {
         if(!optMember.isPresent()) {
             throw new IllegalStateException("Not found member by id " + memberId);
         }
+        // TODO fetch join Query 로 n + 1 문제 해결하기
         Member member = optMember.get();
         List<Coupon> coupons = new ArrayList<>(member.getCoupons());
         coupons = coupons.stream().filter((Coupon coupon)->

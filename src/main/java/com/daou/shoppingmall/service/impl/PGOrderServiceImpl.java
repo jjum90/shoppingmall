@@ -9,7 +9,6 @@ import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.PayType;
-import com.daou.shoppingmall.utils.ProcessUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +33,7 @@ public class PGOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member ny id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
-        context = discountProcessor(context, member, purchaseDto, this);
+        DiscountContext context = discountProcessor(member, purchaseDto, this);
 
         Order order = Order.builder()
                 .createdDate(LocalDateTime.now())

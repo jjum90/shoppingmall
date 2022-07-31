@@ -37,7 +37,7 @@ public class PointOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = discountProcessor(new DiscountContext(), member, purchaseDto, this);
+        DiscountContext context = discountProcessor(member, purchaseDto, this);
 
         Order order = Order.builder()
                 .createdDate(LocalDateTime.now())
