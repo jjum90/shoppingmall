@@ -1,13 +1,19 @@
 package com.daou.shoppingmall.entity;
 
+import com.daou.shoppingmall.dto.DiscountContext;
+import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.utils.PayType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +38,7 @@ public class Order extends BaseEntity implements Serializable {
     @BatchSize(size = 1000)
     @OneToMany(mappedBy = "order")
     @Column(name = "POINT_HIS")
-    private List<PointHistory> pointHistories;
+    private List<PointHistory> pointHistories = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
@@ -56,4 +62,41 @@ public class Order extends BaseEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private PayType payType;
+
+    public static Order save(Member member, PurchaseDto purchaseDto, OrderStatus status, PayType payType) {
+        return Order.builder()
+                .createdDate(LocalDateTime.now())
+                .member(member)
+                .payment(purchaseDto.getTotalAmount())
+                .orderStatus(status)
+                .payType(payType)
+                .build();
+    }
+
+    public static Order save(Coupon coupon, Member member, PurchaseDto purchaseDto, OrderStatus status, PayType payType) {
+        return Order.builder()
+                .createdDate(LocalDateTime.now())
+                .coupon(coupon)
+                .member(member)
+                .payment(purchaseDto.getTotalAmount())
+                .orderStatus(status)
+                .payType(payType)
+                .build();
+    }
+
+    public static Order save(DiscountContext context, Coupon coupon, Member member, OrderStatus status, PayType payType) {
+        return Order.builder()
+                .coupon(coupon)
+                .member(member)
+                .createdDate(LocalDateTime.now())
+                .payment(context.getTotalPayAmount())
+                .mileage(context.getMileage())
+                .orderStatus(status)
+                .payType(payType)
+                .build();
+    }
+
+    public void addPaymentHistory(List<PointHistory> pointHistories) {
+        this.getPointHistories().addAll(pointHistories);
+    }
 }

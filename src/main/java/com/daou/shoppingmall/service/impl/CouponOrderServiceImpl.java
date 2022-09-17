@@ -15,7 +15,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,14 +48,7 @@ public class CouponOrderServiceImpl implements OrderService {
             }
         }
 
-        Order order = Order.builder()
-                .createdDate(LocalDateTime.now())
-                .coupon(coupon)
-                .member(member)
-                .payment(purchaseDto.getTotalAmount())
-                .orderStatus(OrderStatus.COMPLETE)
-                .payType(PayType.COUPON)
-                .build();
+        Order order = Order.save(coupon, member, purchaseDto, OrderStatus.COMPLETE, PayType.COUPON);
         orderRepository.save(order);
     }
 
@@ -88,15 +80,7 @@ public class CouponOrderServiceImpl implements OrderService {
         disCountAmount = totalAmount.times(useCoupon.getDiscountRate());
 
         if(totalAmount.isGreaterThanOrEqual(disCountAmount)) {
-            return DiscountContext.builder()
-                    .coupon(useCoupon)
-                    .totalAmount(context.getTotalAmount())
-                    .totalPayAmount(totalAmount.minus(disCountAmount).getAmount())
-                    .totalDiscountAmount(disCountAmount.getAmount())
-                    .mileage(context.getMileage())
-                    .pointHistories(context.getPointHistories())
-                    .memberId(context.getMemberId())
-                    .build();
+            return DiscountContext.save(context, useCoupon, totalAmount, disCountAmount);
         }
 
         return context;

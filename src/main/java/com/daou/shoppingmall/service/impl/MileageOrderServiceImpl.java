@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -34,19 +33,13 @@ public class MileageOrderServiceImpl implements OrderService {
     @Transactional
     public void paymentOf(PurchaseDto purchaseDto) {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
+
         if(!optMember.isPresent()) {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
         DiscountContext context = discountProcessor(member, purchaseDto, this);
-
-        Order order = Order.builder()
-                .createdDate(LocalDateTime.now())
-                .member(member)
-                .payment(purchaseDto.getTotalAmount())
-                .orderStatus(OrderStatus.COMPLETE)
-                .payType(PayType.COUPON)
-                .build();
+        Order order = Order.save(member, purchaseDto, OrderStatus.COMPLETE, PayType.COUPON);
         orderRepository.save(order);
 
         if(!ObjectUtils.isEmpty(context.getMileage())) {
@@ -80,23 +73,15 @@ public class MileageOrderServiceImpl implements OrderService {
         Money balanceMileageMoney = Money.wons(member.getMileage().getBalance());
         Money useMileageMoney;
 
-        if(totalPayAmount.isGreaterThanOrEqual(balanceMileageMoney)) { // 지불 값이 마일리지보다 클 경우
+        if(totalPayAmount.isGreaterThanOrEqual(balanceMileageMoney)) { // 지불 값이 마일리지 보다 클 경우
             useMileageMoney = balanceMileageMoney;
             totalDiscountMoney = totalDiscountMoney.plus(useMileageMoney);
-        }else { // 지불 값이 마일리지보다 작을 경우
+        }else { // 지불 값이 마일리지 보다 작을 경우
             useMileageMoney = balanceMileageMoney.minus(totalDiscountMoney);
             totalDiscountMoney = totalDiscountMoney.plus(useMileageMoney);
         }
 
-        return DiscountContext.builder()
-                .coupon(context.getCoupon())
-                .pointHistories(context.getPointHistories())
-                .mileage(useMileageMoney.getAmount())
-                .totalDiscountAmount(totalDiscountMoney.getAmount())
-                .totalPayAmount(totalAmount.minus(totalDiscountMoney).getAmount())
-                .totalAmount(context.getTotalAmount())
-                .memberId(context.getMemberId())
-                .build();
+        return DiscountContext.save(context, context.getCoupon(), totalAmount, totalDiscountMoney);
     }
 
 }

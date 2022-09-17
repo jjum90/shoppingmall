@@ -18,7 +18,10 @@ public class Money {
         this.amount = amount;
     }
     public static Money wons(BigDecimal amount) {
-        return new Money(amount);
+        if(amount != null) {
+            return new Money(amount);
+        }
+        return ZERO;
     }
 
     public static Money wons(long amount) {

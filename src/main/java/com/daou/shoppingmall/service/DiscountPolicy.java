@@ -4,7 +4,6 @@ import com.daou.shoppingmall.dto.DiscountContext;
 import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.Member;
 import com.daou.shoppingmall.utils.Money;
-import com.daou.shoppingmall.utils.ProcessUtil;
 
 /**
  * 각 할인 정책에 따른 할인 정보 제공 인터페이스
@@ -19,7 +18,7 @@ public interface DiscountPolicy {
      * @return
      */
     default DiscountContext discountProcessor(Member member, PurchaseDto purchaseDto, DiscountPolicy... policies) {
-        DiscountContext context = ProcessUtil.getDefaultDiscountContext(member, purchaseDto);
+        DiscountContext context = DiscountContext.getDefaultDiscountContext(member, purchaseDto);
         Money totalAmountMoney = Money.wons(purchaseDto.getTotalAmount());
         Money totalPayAmountMoney = Money.wons(purchaseDto.getTotalAmount());
         
@@ -32,6 +31,7 @@ public interface DiscountPolicy {
                 context = policy.processDiscount(context, member, purchaseDto);
             }
         }
+
         return context;
     }
 

@@ -22,8 +22,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 주문, 결제 관리 Wrapper 서비스
- */
+ * OrderWrapperServiceImpl
+ *
+ * @author : 정민석
+ * @version : v1.0
+ * @class 설명 : 주문, 결제 관리 Wrapper 서비스
+ * @작성일 : 2022-08-24
+**/
 @Service
 @RequiredArgsConstructor
 public class OrderWrapperServiceImpl implements OrderWrapperService {

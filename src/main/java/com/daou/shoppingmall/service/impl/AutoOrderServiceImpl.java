@@ -54,17 +54,11 @@ public class AutoOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-
         DiscountContext context = discountProcessor(member, purchaseDto, getPriorityDiscountPolicy());
-
         Coupon coupon = saveCoupon(context);
-
         saveMileage(member, context);
-
         Order order = saveOrder(member, context, coupon);
-
         saveOrderProduct(purchaseDto, order);
-
         savePointHistory(context, order);
     }
 
@@ -93,16 +87,7 @@ public class AutoOrderServiceImpl implements OrderService {
     }
 
     private Order saveOrder(Member member, DiscountContext context, Coupon coupon) {
-        Order order = Order.builder()
-                .createdDate(LocalDateTime.now())
-                .coupon(coupon)
-                .member(member)
-                .createdDate(LocalDateTime.now())
-                .payment(context.getTotalPayAmount())
-                .mileage(context.getMileage())
-                .orderStatus(OrderStatus.COMPLETE)
-                .payType(PayType.AUTO)
-                .build();
+        Order order = Order.save(context, coupon, member, OrderStatus.COMPLETE, PayType.AUTO);
         orderRepository.save(order);
         return order;
     }

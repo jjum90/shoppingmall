@@ -35,7 +35,8 @@ public class MemberServiceImpl implements MemberService {
 
         List<Point> points = new ArrayList<>(member.getPoints());
 
-        return MemberDto.builder().id(member.getId())
+        return MemberDto.builder()
+                .id(member.getId())
                 .name(member.getName())
                 .coupons(coupons)
                 .points(points)

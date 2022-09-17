@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +32,13 @@ public class PointOrderServiceImpl implements OrderService {
     @Transactional
     public void paymentOf(PurchaseDto purchaseDto) {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
+
         if(!optMember.isPresent()) {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
         DiscountContext context = discountProcessor(member, purchaseDto, this);
-
-        Order order = Order.builder()
-                .createdDate(LocalDateTime.now())
-                .member(member)
-                .payment(purchaseDto.getTotalAmount())
-                .orderStatus(OrderStatus.COMPLETE)
-                .payType(PayType.PG)
-                .build();
+        Order order = Order.save(member, purchaseDto, OrderStatus.COMPLETE, PayType.PG);
         orderRepository.save(order);
 
         if(!CollectionUtils.isEmpty(context.getPointHistories())) {
@@ -72,37 +65,22 @@ public class PointOrderServiceImpl implements OrderService {
         Money disCountAmount;
         Money totalAmount = Money.wons(context.getTotalAmount());
         Money totalPayAmount = Money.wons(context.getTotalPayAmount());
-        Money usePointMoney = Money.ZERO;
-        Money totalDiscountMoney =  Money.wons(context.getTotalDiscountAmount());
+        Money totalDiscount =  Money.wons(context.getTotalDiscountAmount());
+        Money usePoint = Money.ZERO;
         List<Point> points = member.getPoints();
         List<PointHistory> pointHistories = new ArrayList<>();
 
         for (Point point: points) {
             Money balance = Money.wons(point.getBalance());
-            disCountAmount = usePointMoney.plus(balance);
+            disCountAmount = usePoint.plus(balance);
 
             if (!totalPayAmount.isGreaterThanOrEqual(disCountAmount)) {
-                disCountAmount = disCountAmount.minus(totalDiscountMoney);
+                disCountAmount = disCountAmount.minus(totalDiscount);
             }
-            totalDiscountMoney = totalDiscountMoney.plus(disCountAmount);
-
-            pointHistories.add(
-                PointHistory.builder()
-                    .usePoint(disCountAmount.getAmount())
-                    .createdDate(LocalDateTime.now())
-                    .point(point)
-                    .build()
-            );
+            totalDiscount = totalDiscount.plus(disCountAmount);
+            pointHistories.add(PointHistory.save(point, disCountAmount));
         }
-
-        return DiscountContext.builder()
-                .coupon(context.getCoupon())
-                .pointHistories(pointHistories)
-                .mileage(context.getMileage())
-                .totalDiscountAmount(totalDiscountMoney.getAmount())
-                .totalPayAmount(totalAmount.minus(totalDiscountMoney).getAmount())
-                .totalAmount(context.getTotalAmount())
-                .memberId(context.getMemberId())
-                .build();
+        context.setPointHistories(pointHistories);
+        return DiscountContext.save(context, context.getCoupon(), totalAmount, totalDiscount);
     }
 }

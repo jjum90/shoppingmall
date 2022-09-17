@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -29,19 +28,13 @@ public class PGOrderServiceImpl implements OrderService {
     @Transactional
     public void paymentOf(PurchaseDto purchaseDto) {
         Optional<Member> optMember = memberRepository.findById(Long.valueOf(purchaseDto.getMemberId()));
+
         if(!optMember.isPresent()) {
             throw new IllegalStateException("Not found member ny id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = discountProcessor(member, purchaseDto, this);
-
-        Order order = Order.builder()
-                .createdDate(LocalDateTime.now())
-                .member(member)
-                .payment(purchaseDto.getTotalAmount())
-                .orderStatus(OrderStatus.COMPLETE)
-                .payType(PayType.PG)
-                .build();
+        discountProcessor(member, purchaseDto, this);
+        Order order = Order.save(member, purchaseDto, OrderStatus.COMPLETE, PayType.PG);
         orderRepository.save(order);
     }
 

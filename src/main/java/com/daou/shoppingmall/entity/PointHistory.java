@@ -1,5 +1,6 @@
 package com.daou.shoppingmall.entity;
 
+import com.daou.shoppingmall.utils.Money;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -29,4 +31,13 @@ public class PointHistory extends BaseEntity {
     private Order order;
 
     private BigDecimal usePoint;
+
+    public static PointHistory save(Point point, Money disCountAmount) {
+        return PointHistory.builder()
+                .usePoint(disCountAmount.getAmount())
+                .createdDate(LocalDateTime.now())
+                .point(point)
+                .build();
+    }
+
 }
