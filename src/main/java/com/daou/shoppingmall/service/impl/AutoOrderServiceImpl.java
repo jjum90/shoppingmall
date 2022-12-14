@@ -6,6 +6,7 @@ import com.daou.shoppingmall.dto.PurchaseDto;
 import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.*;
 import com.daou.shoppingmall.service.DiscountPolicy;
+import com.daou.shoppingmall.service.DiscountService;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.Money;
 import com.daou.shoppingmall.utils.PayType;
@@ -35,6 +36,7 @@ public class AutoOrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
     private final List<DiscountPolicy> policies;
+    private final DiscountService discountService;
 
     /**
      * 자동 결제
@@ -54,7 +56,7 @@ public class AutoOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = discountProcessor(member, purchaseDto, getPriorityDiscountPolicy());
+        DiscountContext context = discountService.discountProcessor(member, purchaseDto, getPriorityDiscountPolicy());
         Coupon coupon = saveCoupon(context);
         saveMileage(member, context);
         Order order = saveOrder(member, context, coupon);

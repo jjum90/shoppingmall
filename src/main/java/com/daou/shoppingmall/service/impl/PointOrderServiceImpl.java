@@ -6,6 +6,7 @@ import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
 import com.daou.shoppingmall.repository.PointHistoryRepository;
+import com.daou.shoppingmall.service.DiscountService;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.Money;
 import com.daou.shoppingmall.utils.PayType;
@@ -27,6 +28,7 @@ public class PointOrderServiceImpl implements OrderService {
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final DiscountService discountService;
 
     @Override
     @Transactional
@@ -37,8 +39,8 @@ public class PointOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = discountProcessor(member, purchaseDto, this);
-        Order order = Order.save(member, purchaseDto, OrderStatus.COMPLETE, PayType.PG);
+        DiscountContext context = discountService.discountProcessor(member, purchaseDto, this);
+        Order order = Order.save(context, member, purchaseDto, OrderStatus.COMPLETE, PayType.PG);
         orderRepository.save(order);
 
         if(!CollectionUtils.isEmpty(context.getPointHistories())) {

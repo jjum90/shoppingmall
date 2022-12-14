@@ -63,6 +63,18 @@ public class Order extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private PayType payType;
 
+    public static Order save(DiscountContext context, Member member, PurchaseDto purchaseDto, OrderStatus status, PayType payType) {
+        return Order.builder()
+                .createdDate(LocalDateTime.now())
+                .member(member)
+                .payment(purchaseDto.getTotalAmount())
+                .orderStatus(status)
+                .payType(payType)
+                .pointHistories(context.getPointHistories())
+                .mileage(context.getMileage())
+                .build();
+    }
+
     public static Order save(Member member, PurchaseDto purchaseDto, OrderStatus status, PayType payType) {
         return Order.builder()
                 .createdDate(LocalDateTime.now())
