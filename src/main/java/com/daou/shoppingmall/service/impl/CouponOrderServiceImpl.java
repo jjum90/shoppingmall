@@ -6,6 +6,7 @@ import com.daou.shoppingmall.entity.*;
 import com.daou.shoppingmall.repository.CouponRepository;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
+import com.daou.shoppingmall.service.DiscountService;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.Money;
 import com.daou.shoppingmall.utils.PayType;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CouponOrderServiceImpl implements OrderService {
+    private final DiscountService discountService;
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
     private final OrderRepository orderRepository;
@@ -36,7 +38,7 @@ public class CouponOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member by id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        DiscountContext context = discountProcessor(member, purchaseDto, this);
+        DiscountContext context = discountService.discountProcessor(member, purchaseDto, this);
 
         Coupon coupon = null;
 

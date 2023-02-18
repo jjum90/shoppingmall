@@ -7,6 +7,7 @@ import com.daou.shoppingmall.entity.Order;
 import com.daou.shoppingmall.entity.OrderStatus;
 import com.daou.shoppingmall.repository.MemberRepository;
 import com.daou.shoppingmall.repository.OrderRepository;
+import com.daou.shoppingmall.service.DiscountService;
 import com.daou.shoppingmall.service.OrderService;
 import com.daou.shoppingmall.utils.PayType;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PGOrderServiceImpl implements OrderService {
+    private final DiscountService discountService;
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
 
@@ -33,7 +35,7 @@ public class PGOrderServiceImpl implements OrderService {
             throw new IllegalStateException("Not found member ny id " + purchaseDto.getMemberId());
         }
         Member member = optMember.get();
-        discountProcessor(member, purchaseDto, this);
+        discountService.discountProcessor(member, purchaseDto, this);
         Order order = Order.save(member, purchaseDto, OrderStatus.COMPLETE, PayType.PG);
         orderRepository.save(order);
     }
